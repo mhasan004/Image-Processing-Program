@@ -42,20 +42,29 @@ HW_contrast(ImagePtr I1, double brightness, double contrast, ImagePtr I2)
 	for (int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {	// get input  pointer for channel ch
 		IP_getChannel(I2, ch, p2, type);	// get output pointer for channel ch
 		for (int i = 0; i < total; i++) {
-			int output = contrast * (*p1++ - g_min);
-			output = output + brightness;
+			/*int output = contrast * (*p1++ - g_min);
+			output += brightness;
 
+			if (output < 0) output = 0;
+			if (output > 255) output = 255;
+			*p2++ = output;*/
+
+
+
+			/*int output = contrast * (128 - *p1++);
+			output += brightness + 128;
+			if (output < 0) output = 0;
+			if (output > 255) output = 255;
+			*p2++ = output;*/
+
+
+			int output = contrast * (*p1++ - 128);	// subtracting the middle intensity value from the pixel value
+			output += brightness + 128;				// shift the graph by the brightness slider AND readding that 128 we took away
 			if (output < 0) output = 0;
 			if (output > 255) output = 255;
 			*p2++ = output;
 
 
-			/*int output = (int) (*p1++ - g_min) * contrast;
-
-
-			if (output < 0) output = 0;
-			if (output > 255) output = 255;
-			*p2++ = output;*/
 		}
 	}
 
