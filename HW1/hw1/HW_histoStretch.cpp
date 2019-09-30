@@ -32,18 +32,22 @@ HW_histoStretch(ImagePtr I1, int t1, int t2, ImagePtr I2)
 		else
 			lut[i] = i;
 	}
-	
+
 	// 2) Use the histogram stretch function. Taking the clipped LUT and applying the formul
 	for (int i = 0; i < MXGRAY; ++i)
 	{
-		if (t1 < t2)		// so no divide by zero. t1 is the lower bound and t2 is the upper bound
-			lut[i] = 255 * (lut[i] - t1) / (t2 - t1);
+		int max = 255;
+		int MIN = 0;
+		if (t1 < t2) {		// so no divide by zero. t1 is the lower bound and t2 is the upper bound
+			//lut[i] = 255 * (lut[i] - t1) / (t2 - t1);				//another way to do it but its normalized from 0 to 255
+			lut[i] = (lut[i] - t1) * (max - MIN) / (t2 - t1) + MIN; //normalizing histogram ranfge from MIn to MAX
+		}
 		else
-			lut[i] = 0;		// like professor's program, it the t1 and t2 are the same, image turns black (0 gray level)
+			lut[i] = MIN;		// like professor's program, it the t1 and t2 are the same, image turns black (0 gray level)
 	}
 
 
-	
+
 	// visit all image channels and evaluate output image
 	for (int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {	// get input  pointer for channel ch
 		IP_getChannel(I2, ch, p2, type);						// get output pointer for channel ch
