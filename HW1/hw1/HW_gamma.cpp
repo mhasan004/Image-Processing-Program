@@ -23,7 +23,8 @@ HW_gammaCorrect(ImagePtr I1, double gamma, ImagePtr I2)
 	int w = I1->width();
 	int h = I1->height();
 	int total = w * h;
-
+	  
+	
 	// init lookup table
 	float lut[MXGRAY];
 	int c = 255;
