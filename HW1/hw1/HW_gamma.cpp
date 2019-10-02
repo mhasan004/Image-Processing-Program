@@ -26,7 +26,7 @@ HW_gammaCorrect(ImagePtr I1, double gamma, ImagePtr I2)
 	  
 	
 	// init lookup table
-	float lut[MXGRAY];
+	int lut[MXGRAY];
 	int c = 255;
 	for (int i = 0; i < MXGRAY; i++) {
 		float output = c * pow((float)(i / c), 1 / gamma);

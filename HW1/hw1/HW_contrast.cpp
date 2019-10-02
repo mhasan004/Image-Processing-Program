@@ -27,17 +27,17 @@ HW_contrast(ImagePtr I1, double brightness, double contrast, ImagePtr I2)
 	int type;
 
 	// Go through image and get smallest and largest pixel intensity:
-	int g_min = 100;
-	int g_max = 0;
-	for (int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {	// get input  pointer for channel ch
-		for (int i = 0; i < total; i++) {		// go through image pixels
-			int pixel = *p1++;					// go to the next pixel every iteration of the for loop
-			if (pixel <= g_min)	
-				g_min = pixel;
-			if (pixel >= g_max)
-				g_max = pixel;
-		}
-	}
+	// int g_min = 100;
+	// int g_max = 0;
+	// for (int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) {	// get input  pointer for channel ch
+	// 	for (int i = 0; i < total; i++) {		// go through image pixels
+	// 		int pixel = *p1++;					// go to the next pixel every iteration of the for loop
+	// 		if (pixel <= g_min)	
+	// 			g_min = pixel;
+	// 		if (pixel >= g_max)
+	// 			g_max = pixel;
+	// 	}
+	// }
 
 	// visit all image channels and evaluate output image
 	for (int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) 	// get input  pointer for channel ch
@@ -45,11 +45,12 @@ HW_contrast(ImagePtr I1, double brightness, double contrast, ImagePtr I2)
 		IP_getChannel(I2, ch, p2, type);			// get output pointer for channel ch
 		for (int i = 0; i < total; i++) 
 		{
-			int output = contrast * (*p1++ - 128);	// subtracting the middle intensity value from the pixel value
-			output += brightness + 128;				// shift the graph by the brightness slider AND readding that 128 we took away
-			if (output < 0) output = 0;
-			if (output > 255) output = 255;
-			*p2++ = output;
+			// int output = contrast * (*p1++ - 128);	// subtracting the middle intensity value from the pixel value
+			// output += brightness + 128;				// shift the graph by the brightness slider AND readding that 128 we took away
+			// if (output < 0) output = 0;
+			// if (output > 255) output = 255;
+			// *p2++ = output;
+			*p2++ = lut[*p1++];	
 		}
 	}
 
