@@ -39,6 +39,17 @@ HW_contrast(ImagePtr I1, double brightness, double contrast, ImagePtr I2)
 	// 	}
 	// }
 
+	// init lookup table
+	int lut[MXGRAY];
+	int s = 128;
+	for (int i = 0; i < MXGRAY; i++) {
+		int output = contrast * (i - s);		// subtracting the middle intensity value from the pixel value
+		output += brightness + s;				// shift the graph by the brightness slider AND readding that 128 we took away
+		if (output < 0) output = 0;
+		if (output > 255) output = 255;
+		lut[i] = output;
+	}
+
 	// visit all image channels and evaluate output image
 	for (int ch = 0; IP_getChannel(I1, ch, p1, type); ch++) 	// get input  pointer for channel ch
 	{
