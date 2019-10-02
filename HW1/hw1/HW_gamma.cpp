@@ -32,7 +32,7 @@ HW_gammaCorrect(ImagePtr I1, double gamma, ImagePtr I2)
 		float output = c * pow((float)i / c, 1 / gamma);
 		if (output < 0.0) output = 0.0;
 		if (output > 255.0) output = 255.0;
-		lut[i] = output;
+		lut[i] = (int) output;
 	}
 
 	// visit all image channels and evaluate output image
