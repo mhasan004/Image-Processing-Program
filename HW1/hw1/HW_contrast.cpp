@@ -41,10 +41,10 @@ HW_contrast(ImagePtr I1, double brightness, double contrast, ImagePtr I2)
 
 	// init lookup table
 	int lut[MXGRAY];
-	int s = 128;
+	int mid = 128;
 	for (int i = 0; i < MXGRAY; i++) {
-		int output = contrast * (i - s);		// subtracting the middle intensity value from the pixel value
-		output += brightness + s;				// shift the graph by the brightness slider AND readding that 128 we took away
+		int output = contrast * (i - mid);		// subtracting the middle intensity value from the pixel value
+		output += brightness + mid;				// shift the graph by the brightness slider AND readding that 128 we took away
 		if (output < 0) output = 0;
 		if (output > 255) output = 255;
 		lut[i] = output;
