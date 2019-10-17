@@ -5,9 +5,8 @@ void histoMatchApprox(ImagePtr, ImagePtr, ImagePtr);
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // HW_histoMatch:
-//
 // Apply histogram matching to I1. Output is in I2.
-//
+// Written by: Mahmudul Hasan and Aninda Halder
 void
 HW_histoMatch(ImagePtr I1, ImagePtr targetHisto, bool approxAlg, ImagePtr I2)
 {
