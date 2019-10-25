@@ -45,10 +45,16 @@ void HW_blur(ImagePtr I1, int filterW, int filterH, ImagePtr I2)
 	int type;
 
 	//bluring causes smaller image so i will pad the image with zeroes. 1padd for 3pixel windows, 2padd for 6
-	int paddingNumberH = (filterH - 1) / 2;		//number of padding needed on sides of rows for a given filter size
+	if (filterH % 2 == 0 && filterH != 1) {						//the bluring window must be odd so will just subtract to previous window
+		filterH--;
+	}
+	if (filterW % 2 == 0 && filterW != 1) {						//the bluring window must be odd so will just subtract to previous window
+		filterW--;
+	}
+	int paddingNumberH = (filterH - 1) / 2;						//number of padding needed on sides of rows for a given filter size
 	int paddingNumberW = (filterW - 1) / 2;
-	vector<int> paddedRow(paddingNumberW * 2 + w, 0);		//make a vector of size paddingNumberW*2+w and set all to 0
-	//fill(v.begin(), v.end(), 0)
+	vector<int> paddedBuffer;									//the buffer vector to shore each row with appropiate pading to left or right. Will then blur row and output to output image I2
+
 	DBOUT(L"\nWIDTH     ");
 	DBOUT(w);
 	DBOUT(L"\nHEIGHT    ");
@@ -66,7 +72,6 @@ void HW_blur(ImagePtr I1, int filterW, int filterH, ImagePtr I2)
 	DBOUT(L"\n");
 
 
-	vector<int> paddedBuffer;// (paddingNumberW * 2 + w, 0);		//make a vector of size paddingNumberW*2+w and set all to 0
 
 	for (int ch = 0; IP_getChannel(I1, ch, in, type); ch++) 	// get input  pointer for channel ch
 	{
@@ -74,50 +79,88 @@ void HW_blur(ImagePtr I1, int filterW, int filterH, ImagePtr I2)
 
 		for (int row = 0; row < h; ++row)
 		{
-			for (int col = 0; col < w; ++col)
+			//DBOUT(L"\nSTART OF ROW:          \n");
+			paddedBuffer.clear();
+			for (int col = 0; col < w; ++col)						//1) Put the input row into a buffer vector and add appropiate padding on sides
 			{
-				int pixel = *in++;									// ***NOTE*** if i didnt use pixel and just put in *p++, the image gets slip diagonally where the left side in on the right and the right on the left. weird
+				int pixel = *in++;									// ***NOTE*** if i didnt use pixel = *in++ and just used *p++, the image gets cut diagonally where the left side in on the right and the right on the left. it was weird
 				if (col == 0) {										// 1a) if its the first pixel in the row...
-					for (int k = 0; k < paddingNumberW; ++k)		// 1b) put zero paddings into the buffer 
+																		/*DBOUT(L"initialVectorSize: ");
+																		DBOUT(paddedBuffer.size());
+																		DBOUT(L"........");*/
+					for (int k = 0; k < paddingNumberW; ++k) {		// 1b) put zero paddings into the buffer 
 						paddedBuffer.push_back(0);
-					paddedBuffer.push_back(pixel);					// 1c1) after padding, insert the first pixel of input row into buffer and copy row pixels as normal
+						/*DBOUT(L"          added LEFT  i");
+						DBOUT(k);*/
+					}
+					paddedBuffer.push_back(pixel);					// 1c) after padding, insert the first pixel of input row into buffer and copy row pixels as normal
+																		/*DBOUT(L",       vectorSize: ");
+																		DBOUT(paddedBuffer.size());
+																		DBOUT(L"\n");*/
 				}
-				if (col == w - 1) {									// 1d) at the end of the row add the last pixel to the buffer then add the padding to the buffer			
+				else if (col == w - 1) {									// 1d) at the end of the row add the last pixel to the buffer then add the padding to the buffer			
+																		/*DBOUT(L"initialVectorSize: ");
+																		DBOUT(paddedBuffer.size());
+																		DBOUT(L"........");*/
 					paddedBuffer.push_back(pixel);
-					for (int k = 0; k < paddingNumberW; ++k)
+					for (int k = 0; k < paddingNumberW; ++k) {
 						paddedBuffer.push_back(0);
+						/*DBOUT(L"          added RIGHT i");
+						DBOUT(k);*/
+					}
+					/*DBOUT(L",       vectorSize: ");
+					DBOUT(paddedBuffer.size());
+					DBOUT(L"\n");*/
 				}
-				else {												// 1c2) if not pixel at beginning or end of image, just copy pixels
+				else {												// 1c) if not pixel at beginning or end of image, just copy pixels
 					paddedBuffer.push_back(pixel);
 				}
 			}
-
-			//print the buffer vector for testing
-			/*DBOUT(L"start: \n");
-			for (vector<int>::size_type i = 0; i < paddedBuffer.size(); i++) {
-				DBOUT(paddedBuffer.at(i));
-				DBOUT(L" ");
-			}
-			DBOUT(L" - end\n");
-*/
-			DBOUT(L"\nvector size of row: ");
+			/*DBOUT(L"\nvector size of row: ");
 			DBOUT(paddedBuffer.size());
-			DBOUT(L"\n ");
+			DBOUT(L"\n ");*/
 
-			//finished the row, now do this:
+			//2) now that i recorded the rows need to blur the row using the filter
 			int counter = 0;
-			for (int colCopy = paddingNumberW; colCopy < (w + paddingNumberW); ++colCopy)
-			{
-				*out++ = CLIP(paddedBuffer.at(colCopy), 0, 255);
+			for (int window = paddingNumberW; window < (paddedBuffer.size() - paddingNumberW); ++window) {
+				int sum = 0;
+				sum += paddedBuffer.at(paddingNumberW);
+				for (int i = 0; i < paddingNumberW; ++i) {
+					sum += paddedBuffer.at(window - i);
+					sum += paddedBuffer.at(window + i);
+				}
+				*out++ = CLIP(sum / filterW, 0, 255);
 				counter++;
-			}
-			DBOUT(L"\n---------------------------------------------------------------- row of output: ");
-			DBOUT(counter);
-			DBOUT(L"\n---------------------------------------------------------------- row of input : ");
-			DBOUT(w);
 
-			//clear vectror to 0 
-			paddedBuffer.clear();//fill(paddedBuffer.begin(), paddedBuffer.end(), 0);
+			}
+
+
+
+
+			////3) finished the row, now print this row from buffer to the output image:
+			//int counter = 0;
+			//for (int colCopy = paddingNumberW; colCopy < (w + paddingNumberW); ++colCopy)
+			//{
+			//	*out++ = CLIP(paddedBuffer.at(colCopy), 0, 255);
+			//	counter++;
+			//}
+								/*DBOUT(L"\n---------------------------------------------------------------- len row output: ");
+								DBOUT(counter);
+								DBOUT(L"\n---------------------------------------------------------------- len row input : ");
+								DBOUT(w);
+
+								DBOUT(L"\n---------------------------------------------------------------- padding#W     : ");
+								DBOUT(paddingNumberW);
+								DBOUT(L"\n---------------------------------------------------------------- padding#H     : ");
+								DBOUT(paddingNumberH);
+								DBOUT(L"\n---------------------------------------------------------------- vector size   : ");
+								DBOUT(paddedBuffer.size());
+								DBOUT(L"\n---------------------------------------------------------------- total         : ");
+								DBOUT(total);*/
+
+
+								//clear vector to 0 
+								//paddedBuffer.clear();//fill(paddedBuffer.begin(), paddedBuffer.end(), 0);
 
 
 		}
