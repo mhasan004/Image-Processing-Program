@@ -55,14 +55,16 @@ void HW_blur(ImagePtr I1, int filterW, int filterH, ImagePtr I2)
 	DBOUT(h);
 	DBOUT(L"\ntotal     ");
 	DBOUT(total);
-	DBOUT(L"\npaddingNumberW:  ");
-	DBOUT(paddingNumberW);
-	DBOUT(L"\npaddingNumberH:  ");
-	DBOUT(paddingNumberH);
 	DBOUT(L"\nfilterW:          ");
 	DBOUT(filterW);
 	DBOUT(L"\nfilterH:          ");
 	DBOUT(filterH);
+	DBOUT(L"\npaddingNumberW:  ");
+	DBOUT(paddingNumberW);
+	DBOUT(L"\npaddingNumberH:  ");
+	DBOUT(paddingNumberH);
+	DBOUT(L"\n");
+
 
 	vector<int> paddedBuffer;// (paddingNumberW * 2 + w, 0);		//make a vector of size paddingNumberW*2+w and set all to 0
 
@@ -74,35 +76,46 @@ void HW_blur(ImagePtr I1, int filterW, int filterH, ImagePtr I2)
 		{
 			for (int col = 0; col < w; ++col)
 			{
+				int pixel = *in++;									// ***NOTE*** if i didnt use pixel and just put in *p++, the image gets slip diagonally where the left side in on the right and the right on the left. weird
 				if (col == 0) {										// 1a) if its the first pixel in the row...
 					for (int k = 0; k < paddingNumberW; ++k)		// 1b) put zero paddings into the buffer 
 						paddedBuffer.push_back(0);
-					paddedBuffer.push_back(*in++);					// 1c1) after padding, insert the first pixel of input row into buffer and copy row pixels as normal
+					paddedBuffer.push_back(pixel);					// 1c1) after padding, insert the first pixel of input row into buffer and copy row pixels as normal
 				}
 				if (col == w - 1) {									// 1d) at the end of the row add the last pixel to the buffer then add the padding to the buffer			
-					paddedBuffer.push_back(*in++);
+					paddedBuffer.push_back(pixel);
 					for (int k = 0; k < paddingNumberW; ++k)
 						paddedBuffer.push_back(0);
 				}
 				else {												// 1c2) if not pixel at beginning or end of image, just copy pixels
-					paddedBuffer.push_back(*in++);
+					paddedBuffer.push_back(pixel);
 				}
 			}
 
-			DBOUT(L"start: \n");
+			//print the buffer vector for testing
+			/*DBOUT(L"start: \n");
 			for (vector<int>::size_type i = 0; i < paddedBuffer.size(); i++) {
-				//cout << paddedBuffer.at(i) << ' ';
 				DBOUT(paddedBuffer.at(i));
 				DBOUT(L" ");
 			}
 			DBOUT(L" - end\n");
-
+*/
+			DBOUT(L"\nvector size of row: ");
+			DBOUT(paddedBuffer.size());
+			DBOUT(L"\n ");
 
 			//finished the row, now do this:
+			int counter = 0;
 			for (int colCopy = paddingNumberW; colCopy < (w + paddingNumberW); ++colCopy)
 			{
-				*out++ = paddedBuffer.at(colCopy);
+				*out++ = CLIP(paddedBuffer.at(colCopy), 0, 255);
+				counter++;
 			}
+			DBOUT(L"\n---------------------------------------------------------------- row of output: ");
+			DBOUT(counter);
+			DBOUT(L"\n---------------------------------------------------------------- row of input : ");
+			DBOUT(w);
+
 			//clear vectror to 0 
 			paddedBuffer.clear();//fill(paddedBuffer.begin(), paddedBuffer.end(), 0);
 
@@ -112,6 +125,3 @@ void HW_blur(ImagePtr I1, int filterW, int filterH, ImagePtr I2)
 	}
 
 }
-
-
-
