@@ -44,55 +44,89 @@ void HW_blur(ImagePtr I1, int filterW, int filterH, ImagePtr I2)
 	int type;
 
 	// Bluring causes smaller image so i will pad the image with zeroes. 1padd for 3pixel windows, 2padd for 6
-	if (filterH % 2 == 0 && filterH != 1) {											// bluring window must be odd so will just subtract to previous window
-		filterH--;
-	}
-	if (filterW % 2 == 0 && filterW != 1) {											// bluring window must be odd so will just subtract to previous window
-		filterW--;
-	}
+//if (filterH % 2 == 0 && filterH!=1) {											// bluring window must be odd so will just subtract to previous window
+//	filterH--;
+//}
+//if (filterW % 2 == 0 && filterW != 1) {											// bluring window must be odd so will just subtract to previous window
+//	filterW--;
+//}
 	int paddingNumberH = (filterH - 1) / 2;											// number of padding needed on sides of rows for a given filter size
 	int paddingNumberW = (filterW - 1) / 2;
-	vector<int> paddedBuffer;														// the buffer vector to shore each row with appropiate pading to left or right. Will then blur row and output to output image I2
-
-
+	vector<int> paddedBufferW;														// the buffer vector to shore each row with appropiate pading to left or right. Will then blur row and output to output image I2
+	vector<int> paddedBufferH;
+	DBOUT(L"\nw: ");
+	DBOUT(w);
+	DBOUT(L"\nh: ");
+	DBOUT(h);
+	DBOUT(L"\nfilter_W:    ");
+	DBOUT(filterW);
+	DBOUT(L"\nfilter_H:    ");
+	DBOUT(filterH);
+	DBOUT(L"\npaddingNumber_W:  ");
+	DBOUT(paddingNumberW);
+	DBOUT(L"\npaddingNumber_H:  ");
+	DBOUT(paddingNumberH);
+	// x blure I1 to I3
 	for (int ch = 0; IP_getChannel(I1, ch, in, type); ch++) 						// get input  pointer for channel ch
 	{
 		IP_getChannel(I2, ch, out, type);
-
 		for (int row = 0; row < h; ++row)
 		{
-			paddedBuffer.clear();
+			paddedBufferW.clear();
+
+			int count = -1;
 			for (int col = 0; col < w; ++col)										// 1) Put the input row into a buffer vector and add appropiate padding on sides
 			{
+				count++;
 				int pixel = *in++;													// ***NOTE*** if i didnt use pixel = *in++ and just used *p++, the image gets cut diagonally where the left side in on the right and the right on the left. it was weird
 				if (col == 0) {														// 1a) if its the first pixel in the row...																		
 					for (int k = 0; k < paddingNumberW; ++k) 						// 1b) put zero paddings into the buffer 
-						paddedBuffer.push_back(0);
-					paddedBuffer.push_back(pixel);									// 1c) after padding, insert the first pixel of input row into buffer and copy row pixels as normal
+						paddedBufferW.push_back(pixel);
+					paddedBufferW.push_back(pixel);									// 1c) after padding, insert the first pixel of input row into buffer and copy row pixels as normal
 				}
 				else if (col == w - 1) {											// 1d) at the end of the row add the last pixel to the buffer then add the padding to the buffer			
-					paddedBuffer.push_back(pixel);
+					paddedBufferW.push_back(pixel);
 					for (int k = 0; k < paddingNumberW; ++k) {
-						paddedBuffer.push_back(0);
+						paddedBufferW.push_back(pixel);
 					}
 				}
 				else {																// 1c) if not pixel at beginning or end of image, just copy pixels
-					paddedBuffer.push_back(pixel);
+					paddedBufferW.push_back(pixel);
+				}
+				if ((row == 0) && (col == 0 || col == 1 || col == w - 2 || col == w - 1)) {
+					DBOUT(L"\nCol: ");
+					DBOUT(col);
+					DBOUT(L"\n     Vector_Size: ");
+					DBOUT(paddedBufferW.size());
 				}
 			}
-			//2 and 3) now that i recorded the rows need to blur the row using the filter and output each blured pixel to output
-			int counter = 0;
-			for (int window = paddingNumberW; window < (paddedBuffer.size() - paddingNumberW); ++window) {
-				int sum = 0;
-				sum += paddedBuffer.at(paddingNumberW);
-				for (int i = 0; i < paddingNumberW; ++i) {
-					sum += paddedBuffer.at(window - i);
-					sum += paddedBuffer.at(window + i);
+			if (row == 0) {
+				DBOUT(L"\n\nCol Count: ");
+				DBOUT(count);
+
+				DBOUT(L"\n\nPrinting row 0 vector:\n");
+				for (int i = 0; i < paddedBufferW.size(); ++i) {
+					DBOUT(paddedBufferW.at(i));
+					DBOUT(L" ");
 				}
-				*out++ = CLIP(sum / filterW, 0, 255);									//3) print blured pixel to output	
-				counter++;
+
+			}
+
+			//2 and 3) now that i recorded the rows need to blur the row using the filter and output each blured pixel to output
+			int countera = 0;
+			for (int window = paddingNumberW; window < (paddedBufferW.size() - paddingNumberW); ++window) {
+				int sum = 0;
+				sum += paddedBufferW.at(window);								//the cause of so much headache. at(window)
+				for (int i = 0; i < paddingNumberW; ++i) {
+					sum += paddedBufferW.at(window - i);
+					sum += paddedBufferW.at(window + i);
+				}
+				*out++ = CLIP(sum / filterW, 0, 255);									//3) print blured pixel to buffer	
+				countera++;
+			}
+			if (row == 0) {
+				DBOUT(L"\nNumber of filter moves:  ");
+				DBOUT(countera);
 			}
 		}
 	}
-
-}
