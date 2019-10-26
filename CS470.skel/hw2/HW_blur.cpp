@@ -76,11 +76,10 @@ void HW_blur(ImagePtr I1, int filterW, int filterH, ImagePtr I2)
 		vector<vector<int> > copy(h);
 		for (int i = 0; i < h; i++)
 			copy[i].resize(w);
-
 		// 2) copy data to vector matrix
 		IP_getChannel(I1, ch, in, type);
 		for (int i = 0; i < h; i++)
-			for (int j = 0; j < h; j++)
+			for (int j = 0; j < w; j++)
 				copy[i][j] = *in++;
 
 		int rowNumber;
@@ -119,7 +118,7 @@ void HW_blur(ImagePtr I1, int filterW, int filterH, ImagePtr I2)
 					sum += paddedBufferH.at(window + i);
 				}
 				//overwrite copy matrix with result:										//4) currently averaging window. output the result and overwrite the pixel at copy matrix. after finishing copy matrix, will print to output
-				copy[window-paddingNumberH][col] = CLIP(sum / filterW, 0, 255);
+				copy[window-paddingNumberH][col] = CLIP(sum / filterH, 0, 255);
 
 
 				//Find the correct position of the pixel for vertical offseet. For Horizontal didnt need to do this. For vertical im doign columns first so i need to push the outpixel appropiately
@@ -131,15 +130,16 @@ void HW_blur(ImagePtr I1, int filterW, int filterH, ImagePtr I2)
 				*out++ = CLIP(sum / filterW, 0, 255);*/
 			}
 		}
+
 		//5) finally copy matrix to output
-		IP_getChannel(I2, ch, buffer, type);
+		IP_getChannel(I3, ch, buffer, type);
 		for (int i = 0; i < h; i++)
-			for (int j = 0; j < h; j++)
+			for (int j = 0; j < w; j++)
 				*buffer++ = copy[i][j];
 
 
 
-		////// Horizontal Blurring: I1 to I3
+		//////// Horizontal Blurring: I1 to I3
 		//IP_getChannel(I3, ch, buffer, type);
 		//for (int row = 0; row < h; ++row)
 		//{																	
@@ -175,3 +175,4 @@ void HW_blur(ImagePtr I1, int filterW, int filterH, ImagePtr I2)
 		//}
 
 	}
+}
