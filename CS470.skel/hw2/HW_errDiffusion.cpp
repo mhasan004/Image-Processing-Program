@@ -26,9 +26,88 @@ using namespace IP;
 // Apply gamma correction to I1 prior to error diffusion.
 // Output is saved in I2.
 //
+void copyRowToCircBuffer(ChannelPtr<uchar>, short*, int, int);
+void gammaCorrect(ImagePtr, double, ImagePtr);
+
+
+
 void
 HW_errDiffusion(ImagePtr I1, int method, bool serpentine, double gamma, ImagePtr I2)
 {
+
+	IP_copyImageHeader(I1, I2);
+	ImagePtr I3; // The temp image pointer for gamma
+	IP_copyImageHeader(I1, I3);
+	gammaCorrect(I1, gamma, I3);
+
+	int w = I1->width();
+	int h = I1->height();
+
+	int thr = MXGRAY / 2;
+
+	ChannelPtr<uchar> in, out;
+
+	if (method == 0) {
+		// method 0 for floyd-steinberg method
+		short* in1;
+		short* in2;
+		short error;
+
+		// top of buffer
+		short* buf0 = new short[w + 2];
+		// bottom of buffer
+		short* buf1 = new short[w + 2];
+		int type;
+		for (int ch = 0; IP_getChannel(I3, ch, in, type); ch++) {
+			IP_getChannel(I2, ch, out, type);
+
+			copyRowToCircBuffer(in, buf0, w, 3);
+			in = in + w;
+
+			for (int y = 1; y < h; y++) {
+				if (serpentine) {
+					// serpentine scan needed to be done
+
+				}
+				else {
+					// raster scan down below
+					// y%2 == 0 perform ops on even rows and else for odds
+					if (y % 2 == 0) {
+						copyRowToCircBuffer(in, buf0, w, 3);
+						in1 = buf1 + 1; // +1 for the padding
+						in2 = buf0 + 1; // same skip for top buffer 
+					}
+					else {
+						copyRowToCircBuffer(in, buf1, w, 3);
+						in1 = buf0 + 1; // +1 skip for padding
+						in2 = buf1 + 1;
+					}
+					in = in + w;
+					for (int x = 0; x < w; x++) {
+						*out = (*in1 < thr) ? 0 : MaxGray; // maxgray or, 255
+						 error = *in1 - *out;
+						*(in1 + 1) += (error*7/16.0);
+						*(in2 - 1) += (error*3/16.0);
+						*(in1    ) += (error*5/16.0);
+						*(in2 + 1) += (error*1/16.0);
+						in1++;
+						in2++;
+						out++;
+
+
+					}
+				}
+			}
+		}
+		delete[] buf0;  // clearing the buffer0
+		delete[] buf1;  // clearing the buffer1
+
+
+	}
+	else if (method == 1) {
+	// Jarvis_judice_ninke Method for 1 to be done
+	
+	}
 
 
 
@@ -38,19 +117,23 @@ HW_errDiffusion(ImagePtr I1, int method, bool serpentine, double gamma, ImagePtr
 
 void copyRowToCircBuffer(ChannelPtr<uchar> p1, short* buffer, int w, int size) {
 	int i = 0;
-	for (i = 0; i < size / 2;    i++) {
-		buffer[i] = *p1; }
-    for (i = 0; i < size + w - 1; i++) {
+	for (i = 0; i < size / 2; i++) {
 		buffer[i] = *p1;
 	}
-
-	for (i = 0; i < size / 2 + w - 1; i++) {
+	
+	for (i = size / 2 + w - 1; i < size + w - 1; i++) {
+		buffer[i] = *p1;
+	}
+	
+	for (i = size/2 ; i < size / 2 + w - 1; i++) {
 		buffer[i] = *p1++;
 	}
+	
+
 }
 
-void
-HW_gammaCorrect(ImagePtr I1, double gamma, ImagePtr I2)
+
+void gammaCorrect(ImagePtr I1, double gamma, ImagePtr I2)
 {
 	// s = c * r^gamma. c=1, r=image input
 	// gamma correction: s = c * r^(1/gamma).
