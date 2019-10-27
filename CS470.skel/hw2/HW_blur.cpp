@@ -5,7 +5,7 @@ using namespace IP;
 using namespace std;
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// HW_blur: Written By mahmudul Hasan and Aninda
+// HW_blur: Written By Mahmudul Hasan and Aninda
 //
 // Blur image I1 with a box filter (unweighted averaging).
 // The filter has width filterW and height filterH.
