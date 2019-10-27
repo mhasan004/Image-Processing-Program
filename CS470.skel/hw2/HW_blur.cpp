@@ -4,6 +4,17 @@
 using namespace IP;
 using namespace std;
 
+//This is to print debug messages to a window. Use DBOUT(L"string to print") or integers: DBOUT(x)
+#include <Windows.h>
+#include <iostream>
+#include <sstream>
+#define DBOUT( s )            \
+{                             \
+   std::wostringstream os_;    \
+   os_ << s;                   \
+   OutputDebugStringW( os_.str().c_str() );  \
+}
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // HW_blur: Written By Mahmudul Hasan and Aninda
 //
@@ -18,24 +29,24 @@ using namespace std;
 
 void HW_blur(ImagePtr I1, int filterW, int filterH, ImagePtr I2)
 {
-	ImagePtr I3;																	// I1 -> I3 will be I1 with appriopiate padding -> blur I3 - > outoput to I2
+	ImagePtr I3;																			// I1 -> I3 will be I1 with appriopiate padding -> blur I3 - > outoput to I2
 	IP_copyImageHeader(I1, I2);
-	IP_copyImageHeader(I1, I3);														// copy I1 header files to I3
+	IP_copyImageHeader(I1, I3);																// copy I1 header files to I3
 
-	ChannelPtr<uchar> in, out, buffer;												// Image channel pointers and datatype
-	int type; 
+	ChannelPtr<uchar> in, out, buffer;														// Image channel pointers and datatype
+	int type;
 	const int w = I1->width();
 	const int h = I1->height();
 	int total = w * h;
 
-	if (filterH % 2 == 0 && filterH!=1) 											// Bluring window must be odd so that the averaged of pixel in window goes to middle pxl. WITH OUT THIS: THE PICTURE GETS DARKER EVERY EVEN FILTER SIZE!
+	if (filterH % 2 == 0 && filterH != 1) 													// Bluring window must be odd so that the averaged of pixel in window goes to middle pxl. WITH OUT THIS: THE PICTURE GETS DARKER EVERY EVEN FILTER SIZE!
 		filterH--;
-	if (filterW % 2 == 0 && filterW != 1) 									
+	if (filterW % 2 == 0 && filterW != 1)
 		filterW--;
-																					// Bluring causes smaller image so i will pad the image with zeroes. 1padd for 3pixel windows, 2padd for 6
-	int paddingNumberH = (filterH - 1) / 2;											// Number of padding needed on sides of rows for a given filter size
-	int paddingNumberW = (filterW - 1) / 2;		
-	vector<int> paddedBufferW;														// The buffer vector to shore each row with appropiate pading to left or right. Will then blur row and output to output image I2
+																							// Bluring causes smaller image so i will pad the image with zeroes. 1padd for 3pixel windows, 2padd for 6
+	int paddingNumberH = (filterH - 1) / 2;													// Number of padding needed on sides of rows for a given filter size
+	int paddingNumberW = (filterW - 1) / 2;
+	vector<int> paddedBufferW;																// The buffer vector to shore each row with appropiate pading to left or right. Will then blur row and output to output image I2
 	vector<int> paddedBufferH;
 
 	for (int ch = 0; IP_getChannel(I1, ch, in, type); ch++) 												// get input  pointer for channel ch
@@ -47,17 +58,16 @@ void HW_blur(ImagePtr I1, int filterW, int filterH, ImagePtr I2)
 		for (int i = 0; i < h; i++)																			// b) copy data to vector matrix
 			for (int j = 0; j < w; j++)
 				copy[i][j] = *in++;
-
 																											///////VERTICAL BLURRING: I1 -> Copy Matrix -> Vertical Blur using Column Vector -> Copy Matrix -> I3///////
 		IP_getChannel(I1, ch, in, type);
 		int rowNumber;
-		for (int col = 0; col < w; ++col)										
+		for (int col = 0; col < w; ++col)
 		{
 			paddedBufferH.clear();
 			for (int row = 0; row < h; ++row)
 			{
 				rowNumber = row;
-				int pixel = copy[row][col];											
+				int pixel = copy[row][col];
 				if (row == 0) {																				// 1) Say ur going through the column, if its the first row, then there needs to be some padding on the top of the image depending on the filter window. Put into the vector (this vector contains the sppecific column + padding)
 					for (int k = 0; k < paddingNumberH; ++k)
 						paddedBufferH.push_back(pixel);
@@ -69,7 +79,7 @@ void HW_blur(ImagePtr I1, int filterW, int filterH, ImagePtr I2)
 						paddedBufferH.push_back(pixel);
 				}
 				else
-					paddedBufferH.push_back(pixel);									
+					paddedBufferH.push_back(pixel);
 			}
 
 			for (int window = paddingNumberH; window < (paddedBufferH.size() - paddingNumberH); ++window)
@@ -115,7 +125,7 @@ void HW_blur(ImagePtr I1, int filterW, int filterH, ImagePtr I2)
 			for (int window = paddingNumberW; window < (paddedBufferW.size() - paddingNumberW); ++window)   // 7) now that i recorded the rows need to blur the row using the filter and output each blured pixel to output
 			{
 				int sum = 0;
-				sum += paddedBufferW.at(window);									
+				sum += paddedBufferW.at(window);
 				for (int i = 1; i <= paddingNumberW; ++i) {
 					sum += paddedBufferW.at(window - i);
 					sum += paddedBufferW.at(window + i);
