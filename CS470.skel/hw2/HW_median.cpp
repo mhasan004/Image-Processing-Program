@@ -89,9 +89,8 @@ void HW_median(ImagePtr I1, int filter, ImagePtr I2)
 				buff[bIndex].push_back(paddedImage[bIndex].at(col));
 
 		//3) As the filter increments down, replace the oldest row index with the newer row. Ex: filter 3x3: buff[0,1,2] -> window down -> buff[3,1,2] -> window down -> buff[3,4,2] -> window down -> buff[3,4,5] -> window down -> buff[6,4,5]
-		vector<vector<int> > output(h);
 		int medianIndex = filter * filter / 2;
-		int k = 5; //what numbers to add from medium
+		int k = 1; //what numbers to add from medium
 		for (int yIncrement = 0; yIncrement < h; ++yIncrement)												// Sliding filter windows vertically direction
 		{
 			for (int xIncrement = 0; xIncrement < w; ++xIncrement)											// Sliding filter windows horizontally direction
