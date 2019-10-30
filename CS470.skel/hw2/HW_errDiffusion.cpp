@@ -319,17 +319,17 @@ void HW_errDiffusion(ImagePtr I1, int method, bool serpentine, double gamma, Ima
 
 
 
-void copyRowToCircBuffer(ChannelPtr<uchar> p1, short* buffer, int w, int size) {
+void copyRowToCircBuffer(ChannelPtr<uchar> in, short* buffer, int w, int size) {
 
 	for (int i = 0; i < size / 2; i++) {
-		buffer[i] = *p1;
+		buffer[i] = *in;
 	}
   
 	for (int i = size / 2 + w - 1; i < size + w - 1; i++) {
-		buffer[i] = *p1;
+		buffer[i] = *in;
 	}
 	for (int i = size / 2; i < size / 2 + w - 1; i++) {
-		buffer[i] = *p1++;
+		buffer[i] = *in++;
 	}
 
 }
