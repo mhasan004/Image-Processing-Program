@@ -39,7 +39,7 @@ void HW_median(ImagePtr I1, int filter, ImagePtr I2)
 
 	int paddingNumber = (filter - 1) / 2;													// Number of padding needed on sides of rows for a given filter size
 	int bufferW = w + 2 * w;
-
+	
 	vector<vector<int> > buff(filter);														// making a 2d vector matrix that can only have 'filter' rows. This will be the circular buffer. will just overwrite old rows.
 	vector<vector<int> > paddedImage(h + 2 * paddingNumber);
 
@@ -84,7 +84,7 @@ void HW_median(ImagePtr I1, int filter, ImagePtr I2)
 
 
 		//2) Circular buffer: initial buffer setup: add the first 'filter' number of rows from the Padded Image to the buffer.
-		for (int bIndex = 0; bIndex < filter; ++bIndex)
+		for (int bIndex = 0; bIndex < filter; ++bIndex)	
 			for (int col = 0; col < paddedImage[bIndex].size(); ++col)
 				buff[bIndex].push_back(paddedImage[bIndex].at(col));
 

@@ -135,7 +135,7 @@ int main()
 		//B) replace old row in buffer with the next row in opaddedImage
 		if (yIncrement < h - 1) {
 			cout << "          aaaaaaaaaaaaaaaaaaaaaaaaaa  filter: " << filter << "    yIncrement: " << yIncrement << "........copy from row: " << filter + yIncrement << "  to row: " << yIncrement << endl;;
-			copyVectorRow(paddedImage, buff, filter + yIncrement, yIncrement);
+			copyVectorRow(paddedImage, buff, filter + yIncrement, yIncrement%filter);
 		}
 	}
 	cout << endl;
