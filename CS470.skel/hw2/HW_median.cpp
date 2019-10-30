@@ -118,7 +118,7 @@ void HW_median(ImagePtr I1, int filter, ImagePtr I2)
 			}
 			//B) replace old row in buffer with the next row in opaddedImage
 			if (yIncrement < h - 1) {
-				copyVectorRow(paddedImage, buff, filter + yIncrement, yIncrement);
+				copyVectorRow(paddedImage, buff, filter + yIncrement, yIncrement%filter); //possible fix
 			}
 		}
 
