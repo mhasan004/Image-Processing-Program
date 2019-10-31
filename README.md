@@ -4,7 +4,7 @@ Only the operation codes of my Image Procesing projects
 
 # Project 2: Neighborhood Operations
 *Error Diffusion, Blur, Sharpen, Median, Convolution Filtering*
-<img src='Walkthrough_Project2_Better.gif' title='Neighborhood Operations Walkthrough' width='' alt='Neighborhood Operations Walkthrough' />
+<img src='Project 2.gif' title='Neighborhood Operations Walkthrough' width='' alt='Neighborhood Operations Walkthrough' />
 
 
 # Project 1: Point Operations
