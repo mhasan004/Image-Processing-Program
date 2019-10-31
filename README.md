@@ -3,7 +3,7 @@ Only the operation codes of my Image Procesing projects
 
 
 # Project 2: Neighborhood Operations
-*Error Diffusion, Blur, Sharpen, Median, Convoler Filtering*
+*Error Diffusion, Blur, Sharpen, Median, Convolution Filtering*
 <img src='Project 2.gif' title='Neighborhood Operations Walkthrough' width='' alt='Neighborhood Operations Walkthrough' />
 
 
