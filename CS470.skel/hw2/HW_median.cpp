@@ -4,7 +4,7 @@
 using namespace IP;
 using std::vector;
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// HW_median: Mahmudul Hasan
+// HW_median: by Mahmudul Hasan
 //
 // Apply median filter of size filter x filter to I1.
 // Clamp filter to 9.
@@ -42,7 +42,9 @@ void HW_median(ImagePtr I1, int filter, ImagePtr I2)
 		IP_getChannel(I1, ch, in, type);																				
 		IP_getChannel(I2, ch, out, type);
 		int rowIncrement = 0;
-		for (int row = 0; row < h; ++row) {																				//1) Make Fully Padded Input Image (paddedImage Vector Matrix) for the circular buffer
+
+		// Padded Image: Better Implementation: use an array of pointers to vectors instead of the "paddedImage" 2D vector because then i wouldnt need to copy entire paded rows, i could just set each row to point to a padded row 
+		for (int row = 0; row < h; ++row) {																				//1) Make Fully Padded Input Image (paddedImage Vector Matrix) for the circular buffer.
 			for (int col = 0; col < w; ++col) {
 				int pixel = *in++;
 				if (col == 0) {																											//left padding = first pixel 
@@ -134,7 +136,5 @@ void HW_median(ImagePtr I1, int filter, ImagePtr I2)
 					buff[(yIncrement + i) % filter] = paddedImage[filter + yIncrement].data();
 			}
 		}
-
 	}
-
 }
