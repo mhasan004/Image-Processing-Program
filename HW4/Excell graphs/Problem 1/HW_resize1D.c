@@ -113,8 +113,7 @@ double t, p;
 	return(0.0);
 }
 
-void resample1D
-(float *IN, float *OUT, int INlen, int OUTlen, int filtertype, double param)
+void resample1D(float *IN, float *OUT, int INlen, int OUTlen, int filtertype, double param)
 {
 	int i;
 	int left, right;	/* kernel extent in input  */
@@ -193,11 +192,11 @@ int main(int argc, char *argv[])
 	{
 		FILE *input, *output;
 
-		char *in_fname  = argv[1];
-		int OUTlen      = atoi(argv[2]);
-		int filtertype  = atoi(argv[3]);
-		double param   = atof(argv[4]);
-		char *out_fname = argv[5];
+		char *in_fname  = argv[1];			// input.txt 
+		int OUTlen      = atoi(argv[2]);	// ouput len - converts str to int
+		int filtertype  = atoi(argv[3]);	// 0 to 5
+		double param   = atof(argv[4]);		// 1,2,3
+		char *out_fname = argv[5];			// output.txt
 
 		// Open files
 		input  = fopen(in_fname, "r");
@@ -234,25 +233,5 @@ int main(int argc, char *argv[])
 		printf("Error: Incorrect number of arguments.");
 		return 0;
 	}
-
-	// float *input = malloc(sizeof(float) * 32);
-	// float *output = malloc(sizeof(float) * 256);
-
-	// for (int i = 0; i < 32; ++i)
-	// {
-	// 	if (i == 16) input [i] = 200;
-	// 	else         input[i]  = 100;
-	// }
-
-	// resample1D(input, output, 32, 256, 2, 1);
-
-	// for (int i = 0; i < 256; ++i)
-	// {
-	// 	printf("%f \n", output[i]);
-	// }
-
-	// free(input);
-	// free(output);
-
 	return 0;
 }
