@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+	Magnification: eye50.bw
+---------------------------------------------------------------------------
+
+1. Over what scale factors are the various kernels acceptable?
+      Box kernel becomes unacceptable at the scale factor of 3. (150x150) Because everything starts to become pixelated. Similarly, cubic convolution becomes unacceptable at the scale factor of 8. (400x400) All other kernels seems acceptable up to the scale factor of 10, because they've successfully blur out the artifacts that appears in box kernel and cubic convolution kernel.
+
+2. Describe the artifacts that appear, including their location and structure.
+      The tiny square artifacts appear at places where the colors are not uniformed. We can different colors being transitioned pixel by pixel. 
+
+---------------------------------------------------------------------------
+	Minification: star.bw, ramp.bw
+---------------------------------------------------------------------------
+
+1. Compare the results between the point sampling (nearest neighbor) and a higher quality filter when minifying star.bw or ramp.bw. 
+   For ramp.bw, all kernels seems to produce similar result. But for star.bw, point sampling tend to produce a minified image with distorted details in the background, while other kernels blurred those details to look more clean.
+
+2. Why does point sampling work well for the ramp.bw image and not for star.bw?
+      Point sampling work well for ramp.bw because the image has smooth color transitions, therefore when we remove pixels from the image, the resulting image will not contain any corrupted details as the colors just appear transition faster. Point sampling does not work well for star.bw, because there are rings within rings in this image, and the background seems to be complexly detailed as well. Therefore, when we apply point sampling, we are removing the small details from the inner rings as we minify the image smaller and smaller. The result is, we are gradually losing the smaller rings on the inside, and the background becomes corrupted as we squash the image smaller and smaller.
