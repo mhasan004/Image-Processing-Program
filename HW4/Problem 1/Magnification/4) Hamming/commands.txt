@@ -1,7 +1,0 @@
-gcc -std=c11 -o resize1d HW_resize1D.c
-
-8 times multiplication. input is size 32 so output will be size 256:
-
-Hamming filter:
-	resize1d input.txt 256 4 2 hamming2.txt
-	resize1d input.txt 256 4 3 hamming3.txt

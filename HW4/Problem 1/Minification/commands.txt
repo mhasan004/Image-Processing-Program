@@ -1,0 +1,12 @@
+g++ -o resize1d HW_resize1D.cpp
+resize1d input.txt output.txt <input len> <output len> <filter> <param>
+
+Scaling down by a factor of 8. Input size is 128 and output size of 16
+
+resize1d min_input.txt box_min.txt      128 16 0 1
+resize1d min_input.txt triangle_min.txt 128 16 1 1
+resize1d min_input.txt cubic_min.txt    128 16 2 -1
+
+resize1d min_input.txt hann3_min.txt    128 16 3 3
+resize1d min_input.txt hamming4_min.txt 128 16 4 4
+resize1d min_input.txt lancros3_min.txt 128 16 5 3

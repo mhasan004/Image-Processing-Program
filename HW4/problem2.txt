@@ -1,0 +1,13 @@
+1.
+    Magnification of text40 images by scale scales of 2,4, and 10 is quite acceptable in my observation as I was abale to recognize images with all kernels.
+    It was most noticiable while using box kernels as pixel to pixel transition is not smooth.
+    For eye50.bw Box kernel at 3 thus is least acceptable also cubic convolution at factor of 8
+    Thats beacuse of the intermidiate values are being replicated from the neighbor pixel instead of interpolating.  
+
+2.  The tiny Artifact usually appears at places with ununiformed colors. We can observe the transition of colors from pixel to pixel.
+
+3. 
+    a) Minifications (Star.bw or ramp.bw) while performing minification we always lose some information. As most noticeable in images with higher frequencies such as star than low frequency images such as ramp when using box filter. 
+    The difference is caused by the sampling. When we sample an image, information in between the sampling points gets lost. For ramp.bw all the kernel produced same results.
+    b) Point sampling works well for ramp.bw as the image has smooth transition of color from pixel to pixel. As we remove imformation , the output image loses corrupted details. 
+    However, star.bw has complex details in the background and it also carries details of rings inside the rings and as we gradually lose pixels due to point sampling, thus more we minify more we lose details and thus the picture appears to be more corrupted

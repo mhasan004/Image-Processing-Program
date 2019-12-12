@@ -8,9 +8,10 @@ double	cubicConv(double, double);
 double	lanczos(double, double);
 double	hann(double, double);
 double	hamming(double, double);
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// By: Mahmudul Hasan and Aninda Halder
 // resize1D:
+//
 // Scale 1D scanline. float version.
 // Input  consists of  len elements in src.
 // Output consists of nlen elements in dst.
